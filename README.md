@@ -1,7 +1,7 @@
 # Fakefinity
 
 **Fakefinity** mirrors a virtual ultrawide display across 3 monitors with bezel compensation.  
-It’s a workaround for broken or deprecated PLP support in AMD Eyefinity and NVIDIA Surround.
+It’s a workaround for broken or deprecated mixed monitors and orientation support in AMD Eyefinity and NVIDIA Surround.
 
 ---
 
