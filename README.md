@@ -1,77 +1,92 @@
-Fakefinity
-Fakefinity mirrors a virtual ultrawide display across 3 monitors with bezel compensation.
+# Fakefinity
+
+**Fakefinity** mirrors a virtual ultrawide display across 3 monitors with bezel compensation.
 It’s a workaround for broken or deprecated PLP support in AMD Eyefinity and NVIDIA Surround.
 
-🖼️ What It Does
-Mirrors a virtual monitor (e.g. from virtual-display-rs)
+---
 
-Displays it in a borderless window stretched across 3 physical screens
+## What It Does
 
-Skips bezel gaps for seamless visual alignment
+* Mirrors a virtual monitor (e.g. from [`virtual-display-rs`](https://github.com/MolotovCherry/virtual-display-rs))
+* Displays it in a borderless window stretched across 3 physical screens
+* Skips bezel gaps for seamless visual alignment
+* Configurable widths, bezels, and position via `Fakefinity.ini`
 
-Configurable widths, bezels, and position via Fakefinity.ini
+---
 
-⚙️ How to Use
-Create a virtual monitor using virtual-display-rs
+## How to Use
 
-Set its resolution to:
-Left + Bezel + Center + Bezel + Right × Height
+1. **Create a virtual monitor** using [`virtual-display-rs`](https://github.com/MolotovCherry/virtual-display-rs)
 
-Edit Fakefinity.ini to match your layout:
+   * Set its resolution to:
+     `Left + Bezel + Center + Bezel + Right` × `Height`
 
-ini
-Copy
-Edit
-WindowX=-997
-WindowY=0
-MonitorIndex=3
-LeftWidth=1280
-CenterWidth=1920
-RightWidth=1280
-BezelSize=50
-VirtualHeight=1080
-Run Fakefinity.exe
+2. **Edit `Fakefinity.ini`** to match your layout:
 
-🧭 Finding the Correct MonitorIndex
+   ```ini
+   WindowX=-997
+   WindowY=0
+   MonitorIndex=3
+   LeftWidth=1280
+   CenterWidth=1920
+   RightWidth=1280
+   BezelSize=50
+   VirtualHeight=1080
+   ```
+
+3. **Run `Fakefinity.exe`**
+
+---
+
+## Finding the Correct `MonitorIndex`
+
 This tells Fakefinity which display to capture (your virtual monitor).
 
-Open Display Settings → click Identify
+* Open **Display Settings** and click **Identify**
+* Find the number shown on the virtual screen (usually the largest one)
+* Then set:
 
-Find the number shown on the virtual screen (usually the largest one)
+  ```ini
+  MonitorIndex = ThatNumber - 1
+  ```
 
-Set:
-MonitorIndex = ThatNumber - 1
-(Windows numbers from 1, Fakefinity uses 0-based index)
+  *(Windows starts at 1, Fakefinity uses 0-based indexing)*
 
-Example:
-If Windows labels your virtual monitor as Display 4, use:
+**Example:**
+If Windows labels your virtual monitor as **Display 4**, use:
 
-ini
-Copy
-Edit
+```ini
 MonitorIndex = 3
-⌨️ Hotkeys
-Ctrl+Alt+Q → Quit
+```
 
-Ctrl+Alt+M → Minimize
+---
 
-Ctrl+Alt+R → Restore & focus
+## Hotkeys
 
-▶️ Runtime Requirements
-Windows 10 or newer
+* `Ctrl+Alt+Q` → Quit
+* `Ctrl+Alt+M` → Minimize
+* `Ctrl+Alt+R` → Restore & focus
 
-A virtual display created by virtual-display-rs
+---
 
-A GPU that supports desktop duplication (most modern GPUs do)
+## Runtime Requirements
 
-🛠️ Build Requirements (if compiling yourself)
-Visual Studio with C++ and Windows SDK
+* Windows 10 or newer
+* A virtual display created by [`virtual-display-rs`](https://github.com/MolotovCherry/virtual-display-rs)
+* A GPU that supports desktop duplication (most modern GPUs do)
 
-Libraries:
+---
 
-d3d11.lib
+## Build Requirements (for developers)
 
-dxgi.lib
+* Visual Studio with C++ and Windows SDK
+* Linked libraries:
 
-📝 License
-MIT — see LICENSE file.
+  * `d3d11.lib`
+  * `dxgi.lib`
+
+---
+
+## License
+
+MIT License — see the `LICENSE` file.
