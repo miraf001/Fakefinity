@@ -1,61 +1,77 @@
-🖥️ Bezel-compensated DXGI screen mirroring tool for multi-monitor setups.
+Fakefinity
+Fakefinity mirrors a virtual ultrawide display across 3 monitors with bezel compensation.
+It’s a workaround for broken or deprecated PLP support in AMD Eyefinity and NVIDIA Surround.
 
-Fakefinity captures a selected monitor's display output and re-renders it as a seamless virtual ultrawide mirror across three monitors, skipping user-defined bezel gaps.
+🖼️ What It Does
+Mirrors a virtual monitor (e.g. from virtual-display-rs)
 
----
+Displays it in a borderless window stretched across 3 physical screens
 
-## ✨ Features
+Skips bezel gaps for seamless visual alignment
 
-- Mirrors any monitor using DXGI output duplication
-- Skips bezels for clean alignment between left, center, and right monitors
-- INI-configurable monitor widths, bezels, window position, and height
-- Hotkeys for quick control:
-  - **Ctrl+Alt+Q** → Quit
-  - **Ctrl+Alt+M** → Minimize
-  - **Ctrl+Alt+R** → Restore & Focus
+Configurable widths, bezels, and position via Fakefinity.ini
 
----
+⚙️ How to Use
+Create a virtual monitor using virtual-display-rs
 
-## ⚙️ INI Configuration (Fakefinity.ini)
+Set its resolution to:
+Left + Bezel + Center + Bezel + Right × Height
 
-```ini
+Edit Fakefinity.ini to match your layout:
+
+ini
+Copy
+Edit
 WindowX=-997
 WindowY=0
-MonitorIndex=1
+MonitorIndex=3
 LeftWidth=1280
 CenterWidth=1920
 RightWidth=1280
 BezelSize=50
 VirtualHeight=1080
-```
+Run Fakefinity.exe
 
-- `WindowX` and `WindowY` set the position of the mirror window.
-- `MonitorIndex` is the zero-based index of the monitor to mirror.
-- `LeftWidth`, `CenterWidth`, `RightWidth` define monitor widths in pixels.
-- `BezelSize` is the pixel gap between displays (horizontal only).
-- `VirtualHeight` can override the height if side monitors are taller.
+🧭 Finding the Correct MonitorIndex
+This tells Fakefinity which display to capture (your virtual monitor).
 
----
+Open Display Settings → click Identify
 
-## 🧰 Build Requirements
+Find the number shown on the virtual screen (usually the largest one)
 
-- Windows 10 or newer
-- Visual Studio with C++ and Windows SDK
-- Linked libraries:
-  - d3d11.lib
-  - dxgi.lib
+Set:
+MonitorIndex = ThatNumber - 1
+(Windows numbers from 1, Fakefinity uses 0-based index)
 
----
+Example:
+If Windows labels your virtual monitor as Display 4, use:
 
-## 🤖 Credits
+ini
+Copy
+Edit
+MonitorIndex = 3
+⌨️ Hotkeys
+Ctrl+Alt+Q → Quit
 
-Fakefinity was originally developed with assistance from OpenAI's ChatGPT, fine-tuned for C++ and DXGI.
+Ctrl+Alt+M → Minimize
 
-- GitHub: [miraf001](https://github.com/miraf001)
-- Tool concept and architecture by the user
+Ctrl+Alt+R → Restore & focus
 
----
+▶️ Runtime Requirements
+Windows 10 or newer
 
-## 📄 License
+A virtual display created by virtual-display-rs
 
-This project is licensed under the MIT License. See `LICENSE` for details.
+A GPU that supports desktop duplication (most modern GPUs do)
+
+🛠️ Build Requirements (if compiling yourself)
+Visual Studio with C++ and Windows SDK
+
+Libraries:
+
+d3d11.lib
+
+dxgi.lib
+
+📝 License
+MIT — see LICENSE file.
