@@ -33,10 +33,15 @@ It’s a workaround for broken or deprecated PLP support in AMD Eyefinity and NV
    BezelSize=50
    VirtualHeight=1080
    ```
-*WindowX and Y - position of the virtual screen on your triple monitor setup, usualy X will be -width of your side monitor and Y 0
-*MonitorIndex - see below
-*LeftWidth, CenterWidth, RightWidth - Width of each of your monitors
-*BezelSize - size of the bezel, you can use 0 to disable bezel functionality.
+WindowX and Y - position of the virtual screen on your triple monitor setup, usualy X will be -width of your side monitor and Y 0
+
+
+MonitorIndex - see below
+
+LeftWidth, CenterWidth, RightWidth - Width of each of your monitors
+
+BezelSize - size of the bezel, you can use 0 to disable bezel functionality.
+
 
 3. **Run `Fakefinity.exe`**
 
