@@ -1,4 +1,4 @@
-// VirtualCapture.cpp — with Bezel Compensation and INI-configurable layout
+// VirtualCapture.cpp â€” Bezel Compensation, INI auto-generation, and restored smooth DXGI sync
 // Mirrors display output across 3 monitors with bezel gaps skipped (fully INI-configurable)
 
 #include <windows.h>
@@ -7,6 +7,7 @@
 #include <wrl/client.h>
 #include <fstream>
 #include <sstream>
+#include <map>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -35,28 +36,53 @@ UINT g_centerWidth = 1920;
 UINT g_rightWidth = 997;
 UINT g_bezelSize = 45;
 UINT g_virtualHeightOverride = 0;
+UINT g_refreshRate = 60;
 
 void LoadSettings()
 {
-    std::ifstream ini("Fakefinity.ini");
-    std::string line;
-    while (std::getline(ini, line)) {
-        std::istringstream iss(line);
-        std::string key;
-        if (std::getline(iss, key, '=')) {
-            std::string value;
-            if (std::getline(iss, value)) {
-                if (key == "WindowX") g_windowX = std::stoi(value);
-                else if (key == "WindowY") g_windowY = std::stoi(value);
-                else if (key == "MonitorIndex") g_targetOutputIndex = std::stoi(value);
-                else if (key == "LeftWidth") g_leftWidth = std::stoi(value);
-                else if (key == "CenterWidth") g_centerWidth = std::stoi(value);
-                else if (key == "RightWidth") g_rightWidth = std::stoi(value);
-                else if (key == "BezelSize") g_bezelSize = std::stoi(value);
-                else if (key == "VirtualHeight") g_virtualHeightOverride = std::stoi(value);
+    std::map<std::string, std::string> defaults = {
+        {"WindowX", "-997"},
+        {"WindowY", "0"},
+        {"MonitorIndex", "3"},
+        {"LeftWidth", "997"},
+        {"CenterWidth", "1920"},
+        {"RightWidth", "997"},
+        {"BezelSize", "45"},
+        {"VirtualHeight", "0"},
+        {"RefreshRate", "60"}
+    };
+
+    std::ifstream iniIn("Fakefinity.ini");
+    if (iniIn.is_open()) {
+        std::string line;
+        while (std::getline(iniIn, line)) {
+            std::istringstream iss(line);
+            std::string key;
+            if (std::getline(iss, key, '=')) {
+                std::string value;
+                if (std::getline(iss, value)) {
+                    defaults[key] = value;
+                }
             }
         }
+        iniIn.close();
     }
+
+    g_windowX = std::stoi(defaults["WindowX"]);
+    g_windowY = std::stoi(defaults["WindowY"]);
+    g_targetOutputIndex = std::stoi(defaults["MonitorIndex"]);
+    g_leftWidth = std::stoi(defaults["LeftWidth"]);
+    g_centerWidth = std::stoi(defaults["CenterWidth"]);
+    g_rightWidth = std::stoi(defaults["RightWidth"]);
+    g_bezelSize = std::stoi(defaults["BezelSize"]);
+    g_virtualHeightOverride = std::stoi(defaults["VirtualHeight"]);
+    g_refreshRate = std::stoi(defaults["RefreshRate"]);
+
+    std::ofstream iniOut("Fakefinity.ini", std::ios::trunc);
+    for (const auto& kv : defaults) {
+        iniOut << kv.first << "=" << kv.second << "\n";
+    }
+    iniOut.close();
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -127,12 +153,12 @@ bool InitSwapChain()
     scDesc.BufferDesc.Width = g_outputWidth;
     scDesc.BufferDesc.Height = g_outputHeight;
     scDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    scDesc.BufferDesc.RefreshRate.Numerator = g_refreshRate;
+    scDesc.BufferDesc.RefreshRate.Denominator = 1;
     scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scDesc.OutputWindow = g_hWnd;
     scDesc.SampleDesc.Count = 1;
     scDesc.Windowed = TRUE;
-    scDesc.BufferDesc.RefreshRate.Numerator = 60;
-    scDesc.BufferDesc.RefreshRate.Denominator = 1;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
     hr = dxgiFactory->CreateSwapChain(g_d3dDevice.Get(), &scDesc, &g_swapChain);
@@ -151,7 +177,11 @@ bool CaptureAndRender()
     DXGI_OUTDUPL_FRAME_INFO frameInfo = {};
     ComPtr<IDXGIResource> desktopResource;
     HRESULT hr = g_duplication->AcquireNextFrame(100, &frameInfo, &desktopResource);
-    if (FAILED(hr)) return false;
+
+    if (hr == DXGI_ERROR_WAIT_TIMEOUT)
+        return true;
+    if (FAILED(hr))
+        return false;
 
     ComPtr<ID3D11Texture2D> acquiredTex;
     desktopResource.As(&acquiredTex);
@@ -224,6 +254,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
             DispatchMessage(&msg);
         }
         if (msg.message == WM_QUIT) break;
+
         CaptureAndRender();
     }
 
